@@ -5,9 +5,12 @@ import (
 )
 
 func main() {
-	chord := scanString()
+	chord := []string{"C#"}
 
-	fmt.Println(chord)
+  translator := NewChordsTranslator()
+  translator.Process(chord)
+
+  fmt.Println(translator.GetStateInNotesFormat())
 }
 
 func scanString() string {
