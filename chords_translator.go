@@ -4,8 +4,26 @@ import (
 	"strings"
 )
 
+type State struct {
+	Fundamental *int
+	Third       Interval
+	Fifth       Interval
+}
+
+type Interval struct {
+	ChromaticSemitones int
+	DiatonicSemitones  int
+}
+
 var (
-	notePositions = map[string]int{"C": 1, "C#": 2, "Cb": 3, "D": 4, "D#": 5, "Db": 6, "E": 7, "E#": 8, "Eb": 9, "F": 10, "F#": 11, "Fb": 12, "G": 13, "G#": 14, "Gb": 15, "A": 16, "A#": 17, "Ab": 18, "B": 19, "B#": 20, "Bb": 21}
+	sharpPositions = map[string]int{
+		"C": 1, "C#": 2,
+		"D": 4, "D#": 5,
+		"E": 7, "F": 10,
+		"F#": 11, "G": 12,
+		"G#": 13, "A": 14,
+		"A#": 15, "B": 16,
+	}
 	positionNotes = map[int]string{1: "C", 2: "C#", 3: "Cb", 4: "D", 5: "D#", 6: "Db", 7: "E", 8: "E#", 9: "Eb", 10: "F", 11: "F#", 12: "Fb", 13: "G", 14: "G#", 15: "Gb", 16: "A", 17: "A#", 18: "Ab", 19: "B", 20: "B#", 21: "Bb"}
 	augSymbols    = map[string]bool{"aug": true, "+": true}
 	majSymbols    = map[string]bool{"maj": true, "M": true, "Δ": true}
@@ -32,7 +50,7 @@ func NewChordsTranslator() *ChordsTranslator {
 }
 
 func initializeStates(translator *ChordsTranslator) {
-	for note, _ := range notePositions {
+	for note := range sharpPositions {
 		third, fifth := initThirdAndFifth(4, 7)
 		translator.States[note] = []*int{translator.CurrentState[0], third, fifth}
 	}
@@ -44,7 +62,7 @@ func initializeStates(translator *ChordsTranslator) {
 }
 
 func insertSymbolsMapping(translator *ChordsTranslator, lettersMap map[string]bool, third, fifth int) {
-	for symbol, _ := range lettersMap {
+	for symbol := range lettersMap {
 		third, fifth := initThirdAndFifth(third, fifth)
 		translator.States[symbol] = []*int{translator.CurrentState[0], third, fifth}
 	}
@@ -105,7 +123,7 @@ func (translator *ChordsTranslator) Process(word []string) {
 
 func (translator *ChordsTranslator) Transition(symbol string) {
 	if *translator.CurrentState[0] == 0 {
-		notePosition, ok := notePositions[symbol]
+		notePosition, ok := sharpPositions[symbol]
 		if !ok {
 			return
 		}
