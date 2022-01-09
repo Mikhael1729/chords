@@ -8,6 +8,14 @@ type Chord struct {
 	Fifth       Interval
 }
 
+func (chord Chord) GetCalification() IntervalCalification {
+  if chord.IsMajor() {
+    return Major
+  }
+
+  return Minor
+}
+
 func (chord Chord) IsMajor() bool {
 	thirdIsMajor := chord.Third == Intervals[Third][Major]
 	fifthIsJust := chord.Fifth == Intervals[Fifth][Just]
@@ -17,7 +25,7 @@ func (chord Chord) IsMajor() bool {
 
 func (chord *Chord) ToString() string {
 	notes := []string{}
-	fundamentalPosition := *chord.Fundamental
+	//fundamentalPosition := *chord.Fundamental
 
 	fundamental := chord.getFundamentalName()
 	notes = append(notes, fundamental)
@@ -25,31 +33,42 @@ func (chord *Chord) ToString() string {
 	third := chord.getThirdNoteName()
 	notes = append(notes, third)
 
-	fifth := getFifthNoteName(fundamentalPosition, chord.Fifth)
-	notes = append(notes, fifth)
+  fifth := chord.getFifthNote()
+  notes = append(notes, fifth)
 
 	return strings.Join(notes, ",")
 }
 
-func (chord Chord) getFundamentalName() string {
-	return ascendingPositionsNotes[*chord.Fundamental]
+func (chord Chord) getFifthNote() string {
+  // TODO:
+  fundamental := chord.getFundamentalName()
+  fifthCalification := GetCalification(Fifth, chord.Fifth)
+  chordClassification := Intervals[Fifth][fifthCalification]
+  fifth := GetNoteFromInterval(fundamental, Fifth, chordClassification)
+
+  return fifth
 }
 
 func (chord Chord) getThirdNoteName() string {
-	if thirdNotePosition == 3 {
-		return ascendingPositionsNotes[fundamentalPosition+8]
-	}
+  fundamental := chord.getFundamentalName()
+  thirdCalification := GetCalification(Third, chord.Third)
+  chordClassification := Intervals[Third][thirdCalification]
+  third := GetNoteFromInterval(fundamental, Third, chordClassification)
 
-	return ascendingPositionsNotes[fundamentalPosition+6]
+  return third
+}
+
+func (chord Chord) getFundamentalName() string {
+	return positionsNotes[*chord.Fundamental]
 }
 
 func getFifthNoteName(fundamentalPosition, fithNotePosition int) string {
 	if fithNotePosition == 6 {
-		return ascendingPositionsNotes[fundamentalPosition+14]
+		return positionsNotes[fundamentalPosition+14]
 	}
 	if fithNotePosition == 7 {
-		return ascendingPositionsNotes[fundamentalPosition+12]
+		return positionsNotes[fundamentalPosition+12]
 	}
 
-	return ascendingPositionsNotes[fundamentalPosition+13]
+	return positionsNotes[fundamentalPosition+13]
 }

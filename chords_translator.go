@@ -16,8 +16,8 @@ type ChordsTranslator struct {
 func NewChordsTranslator() *ChordsTranslator {
 	newTranslator := &ChordsTranslator{
 		States:       map[string]Chord{},
-		CurrentState: []*int{new(int), new(int), new(int)},
-		InitialState: []*int{new(int), new(int), new(int)},
+		CurrentState: Chord{},
+		InitialState: Chord{},
 	}
 
 	initializeStates(newTranslator)
@@ -26,15 +26,15 @@ func NewChordsTranslator() *ChordsTranslator {
 }
 
 func initializeStates(translator *ChordsTranslator) {
-	for note := range ascendingNotesPositions {
+	for note := range notesPositions {
 		translator.States[note] = Chord{
-			Fifth:       Interval{3, 4},
-			Third:       Interval{2, 2},
+			Fifth:       Intervals[Fifth][Just],
+			Third:       Intervals[Third][Major],
 			Fundamental: translator.CurrentState.Fundamental,
 		}
 	}
 
-	//insertSymbolsMapping(translator, majSymbols, {}, 7)
+  insertSymbolsMapping(translator, majSymbols, Intervals[Third][Major], Intervals[Fifth][Just])
 	//insertSymbolsMapping(translator, minSymbols, 3, 7)
 	//insertSymbolsMapping(translator, augSymbols, 4, 8)
 	//insertSymbolsMapping(translator, dimSymbols, 3, 6)
@@ -58,7 +58,7 @@ func (translator *ChordsTranslator) Process(word []string) {
 
 func (translator *ChordsTranslator) Transition(symbol string) {
 	if *translator.CurrentState[0] == 0 {
-		notePosition, ok := ascendingNotesPositions[symbol]
+		notePosition, ok := notesPositions[symbol]
 		if !ok {
 			return
 		}

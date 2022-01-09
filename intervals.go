@@ -1,5 +1,9 @@
 package main
 
+import "math"
+
+const limit = 11
+
 type IntervalCalification string
 
 const (
@@ -23,7 +27,7 @@ type Interval struct {
 }
 
 func (interval Interval) GetSemitonesSum() int {
-  return interval.ChromaticSemitones + interval.DiatonicSemitones
+	return interval.ChromaticSemitones + interval.DiatonicSemitones
 }
 
 var Intervals = map[IntervalClassification]map[IntervalCalification]Interval{
@@ -40,23 +44,71 @@ var Intervals = map[IntervalClassification]map[IntervalCalification]Interval{
 	},
 }
 
-func GetNoteFromInterval(note string, interval Interval, classification IntervalClassification) string {
-  basePosition := ascendingNotesPositions[note]
-  targetPosition := basePosition + interval.GetSemitonesSum()
-
-  if classification == Third {
-    baseRawNote := ExtractNoteRawName(note)
-    targetRawNote := Ñ
-    possibleTargetRawNote := ExtractNoteRawName(ascendingPositionsNotes[targetPosition])
-
-    //targetsTheCorrectNote := 
+func GetCalification(classification IntervalClassification, interval Interval) IntervalCalification {
+  for calification, currentInterval := range Intervals[classification] {
+    if currentInterval == interval {
+      return calification
+    }
   }
+
+  return IntervalCalification("")
+}
+
+func GetNoteFromInterval(note string, classification IntervalClassification, interval Interval) string {
+	if classification == Third {
+		return getThirdFromInterval(note, interval)
+	}
+
+	return ""
+}
+
+func getThirdFromInterval(sourceNote string, interval Interval) string {
+	semitonesSum := interval.GetSemitonesSum()
+
+	targetPosition := notesPositions[sourceNote] + semitonesSum
+	targetNote := positionsNotes[targetPosition]
+	targetName := ExtractNoteRawName(targetNote)
+
+	rawSourceNote := ExtractNoteRawName(sourceNote)
+
+	targetRawPosition := notesPositions[rawSourceNote] + semitonesSum
+	targetRawNote := positionsNotes[targetRawPosition]
+	targetRawName := ExtractNoteRawName(targetRawNote)
+
+	if targetName != targetRawName {
+		if targetPosition < targetRawPosition {
+      return missingBemolsPositionsNotes[targetPosition]
+    }
+
+    return missingSharpsPositionsNotes[targetPosition]
+	}
+
+	return positionsNotes[targetPosition]
+}
+
+func normalizeNotePosition(notePosition int) int {
+	if notePosition <= limit {
+		return notePosition
+	}
+
+	timesLimitIsContained := int(math.Floor(float64(notePosition) / float64(limit)))
+	normalizedPosition := notePosition - limit*timesLimitIsContained
+
+	return normalizedPosition
+}
+
+func noteNamesAreEqual(firstNote, secondNote string) bool {
+	if firstNote[0] == secondNote[0] {
+		return true
+	}
+
+	return false
 }
 
 func ExtractNoteRawName(note string) string {
-  if len(note) == 2 {
-    return note
-  }
+	if len(note) == 1 {
+		return note
+	}
 
-  return note[0:1]
+	return note[0:1]
 }
