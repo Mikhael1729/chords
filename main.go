@@ -7,10 +7,10 @@ import (
 func main() {
 	chord := []string{"C#", "min"}
 
-  translator := NewChordsTranslator()
-  translator.Process(chord)
+	translator := NewChordsTranslator()
+	translator.Process(chord)
 
-  fmt.Println(translator.GetStateInNotesFormat())
+	fmt.Println(translator.CurrentState.ToString())
 }
 
 func scanString() string {

@@ -9,18 +9,18 @@ type Chord struct {
 }
 
 func (chord Chord) GetCalification() IntervalCalification {
-  if chord.IsMajor() {
-    return Major
-  }
+	if chord.IsMajor() {
+		return Major
+	}
 
-  return Minor
+	return Minor
 }
 
 func (chord Chord) IsMajor() bool {
 	thirdIsMajor := chord.Third == Intervals[Third][Major]
 	fifthIsJust := chord.Fifth == Intervals[Fifth][Just]
 
-  return thirdIsMajor && fifthIsJust
+	return thirdIsMajor && fifthIsJust
 }
 
 func (chord *Chord) ToString() string {
@@ -33,29 +33,28 @@ func (chord *Chord) ToString() string {
 	third := chord.getThirdNoteName()
 	notes = append(notes, third)
 
-  fifth := chord.getFifthNote()
-  notes = append(notes, fifth)
+	fifth := chord.getFifthNote()
+	notes = append(notes, fifth)
 
 	return strings.Join(notes, ",")
 }
 
 func (chord Chord) getFifthNote() string {
-  // TODO:
-  fundamental := chord.getFundamentalName()
-  fifthCalification := GetCalification(Fifth, chord.Fifth)
-  chordClassification := Intervals[Fifth][fifthCalification]
-  fifth := GetNoteFromInterval(fundamental, Fifth, chordClassification)
+	fundamental := chord.getFundamentalName()
+	fifthCalification := GetCalification(Fifth, chord.Fifth)
+	chordClassification := Intervals[Fifth][fifthCalification]
+	fifth := GetNoteFromInterval(fundamental, Fifth, chordClassification)
 
-  return fifth
+	return fifth
 }
 
 func (chord Chord) getThirdNoteName() string {
-  fundamental := chord.getFundamentalName()
-  thirdCalification := GetCalification(Third, chord.Third)
-  chordClassification := Intervals[Third][thirdCalification]
-  third := GetNoteFromInterval(fundamental, Third, chordClassification)
+	fundamental := chord.getFundamentalName()
+	thirdCalification := GetCalification(Third, chord.Third)
+	chordClassification := Intervals[Third][thirdCalification]
+	third := GetNoteFromInterval(fundamental, Third, chordClassification)
 
-  return third
+	return third
 }
 
 func (chord Chord) getFundamentalName() string {

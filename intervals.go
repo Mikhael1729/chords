@@ -31,13 +31,13 @@ func (interval Interval) GetSemitonesSum() int {
 }
 
 var Intervals = map[IntervalClassification]map[IntervalCalification]Interval{
-	Third: map[IntervalCalification]Interval{
+	Third: {
 		Diminished: Interval{ChromaticSemitones: 0, DiatonicSemitones: 2},
 		Minor:      Interval{ChromaticSemitones: 1, DiatonicSemitones: 2},
 		Major:      Interval{ChromaticSemitones: 2, DiatonicSemitones: 2},
 		Augmented:  Interval{ChromaticSemitones: 3, DiatonicSemitones: 2},
 	},
-	Fifth: map[IntervalCalification]Interval{
+	Fifth: {
 		Diminished: Interval{ChromaticSemitones: 2, DiatonicSemitones: 4},
 		Just:       Interval{ChromaticSemitones: 3, DiatonicSemitones: 4},
 		Augmented:  Interval{ChromaticSemitones: 4, DiatonicSemitones: 4},
@@ -45,13 +45,13 @@ var Intervals = map[IntervalClassification]map[IntervalCalification]Interval{
 }
 
 func GetCalification(classification IntervalClassification, interval Interval) IntervalCalification {
-  for calification, currentInterval := range Intervals[classification] {
-    if currentInterval == interval {
-      return calification
-    }
-  }
+	for calification, currentInterval := range Intervals[classification] {
+		if currentInterval == interval {
+			return calification
+		}
+	}
 
-  return IntervalCalification("")
+	return IntervalCalification("")
 }
 
 func GetNoteFromInterval(note string, classification IntervalClassification, interval Interval) string {
@@ -77,10 +77,10 @@ func getThirdFromInterval(sourceNote string, interval Interval) string {
 
 	if targetName != targetRawName {
 		if targetPosition < targetRawPosition {
-      return missingBemolsPositionsNotes[targetPosition]
-    }
+			return missingBemolsPositionsNotes[targetPosition]
+		}
 
-    return missingSharpsPositionsNotes[targetPosition]
+		return missingSharpsPositionsNotes[targetPosition]
 	}
 
 	return positionsNotes[targetPosition]
@@ -95,14 +95,6 @@ func normalizeNotePosition(notePosition int) int {
 	normalizedPosition := notePosition - limit*timesLimitIsContained
 
 	return normalizedPosition
-}
-
-func noteNamesAreEqual(firstNote, secondNote string) bool {
-	if firstNote[0] == secondNote[0] {
-		return true
-	}
-
-	return false
 }
 
 func ExtractNoteRawName(note string) string {
