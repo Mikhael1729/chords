@@ -49,7 +49,7 @@ func (chord *Chord) ToString() string {
 	fifth := chord.getNote(Fifth, chord.Fifth)
 	notes = append(notes, fifth)
 
-	return strings.Join(notes, ",")
+	return strings.Join(notes, ", ")
 }
 
 func (chord *Chord) getNote(classification IntervalClassification, interval Interval) string {
