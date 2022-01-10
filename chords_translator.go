@@ -7,8 +7,13 @@ var (
 	dimSymbols = map[string]bool{"dim": true, "°": true}
 )
 
+type ChordOperation struct {
+	ThirdOperation Interval
+	FifthOperation Interval
+}
+
 type ChordsTranslator struct {
-	States       map[string]Chord
+	States       map[string]map[ChordCalification]ChordOperation
 	InitialState Chord
 	CurrentState Chord
 }
@@ -16,7 +21,7 @@ type ChordsTranslator struct {
 func NewChordsTranslator() *ChordsTranslator {
 	fundamental := -1
 	newTranslator := &ChordsTranslator{
-		States: map[string]Chord{},
+		States: map[string]map[ChordCalification]ChordOperation{},
 		CurrentState: Chord{
 			Fundamental: &fundamental,
 			Third:       Interval{},
@@ -31,26 +36,23 @@ func NewChordsTranslator() *ChordsTranslator {
 
 func initializeStates(translator *ChordsTranslator) {
 	for note := range notesPositions {
-		translator.States[note] = Chord{
-			Fifth:       Intervals[Fifth][Just],
-			Third:       Intervals[Third][Major],
-			Fundamental: translator.CurrentState.Fundamental,
+		translator.States[note] = make(map[ChordCalification]ChordOperation)
+		translator.States[note][UndefinedChordCalification] = ChordOperation{
+			ThirdOperation: Intervals[Third][Major],
+			FifthOperation: Intervals[Fifth][Just],
 		}
 	}
 
-	insertSymbolsMapping(translator, majSymbols, Intervals[Third][Major], Intervals[Fifth][Just])
-	insertSymbolsMapping(translator, minSymbols, Intervals[Third][Minor], Intervals[Fifth][Just])
-	insertSymbolsMapping(translator, augSymbols, Intervals[Third][Major], Intervals[Fifth][Augmented])
-	insertSymbolsMapping(translator, dimSymbols, Intervals[Third][Minor], Intervals[Fifth][Diminished])
+	insertSymbolsMapping(translator, MajorChord, majSymbols, ChordOperation{Interval{0, 0}, Interval{0, 0}})
+	insertSymbolsMapping(translator, MajorChord, minSymbols, ChordOperation{Interval{-1, 0}, Interval{0, 0}})
+	insertSymbolsMapping(translator, MajorChord, augSymbols, ChordOperation{Interval{0, 0}, Interval{1, 0}})
+	insertSymbolsMapping(translator, MajorChord, dimSymbols, ChordOperation{Interval{-1, 0}, Interval{-1, 0}})
 }
 
-func insertSymbolsMapping(translator *ChordsTranslator, lettersMap map[string]bool, third, fifth Interval) {
+func insertSymbolsMapping(translator *ChordsTranslator, chordCalifiation ChordCalification, lettersMap map[string]bool, operation ChordOperation) {
 	for symbol := range lettersMap {
-		translator.States[symbol] = Chord{
-			Fifth:       fifth,
-			Third:       third,
-			Fundamental: translator.CurrentState.Fundamental,
-		}
+		translator.States[symbol] = make(map[ChordCalification]ChordOperation)
+		translator.States[symbol][chordCalifiation] = operation
 	}
 }
 
@@ -68,7 +70,11 @@ func (translator *ChordsTranslator) Transition(symbol string) {
 		}
 
 		*translator.CurrentState.Fundamental = notePosition
+
+		translator.CurrentState.SumOperations(translator.States[symbol][UndefinedChordCalification])
 	}
 
-	translator.CurrentState = translator.States[symbol]
+	chordCalification := translator.CurrentState.GetCalification()
+
+	translator.CurrentState.SumOperations(translator.States[symbol][chordCalification])
 }

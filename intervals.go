@@ -4,21 +4,33 @@ import "math"
 
 const limit = 11
 
+type ChordCalification string
+
+const (
+	MinorChord                 ChordCalification = "minor"
+	MajorChord                 ChordCalification = "major"
+	DiminishedChord            ChordCalification = "diminished"
+	AugmentedChord             ChordCalification = "augmented"
+	UndefinedChordCalification ChordCalification = "undefined"
+)
+
 type IntervalCalification string
 
 const (
-	Diminished IntervalCalification = "D"
-	Minor      IntervalCalification = "m"
-	Just       IntervalCalification = "J"
-	Major      IntervalCalification = "M"
-	Augmented  IntervalCalification = "A"
+	Diminished            IntervalCalification = "D"
+	Minor                 IntervalCalification = "m"
+	Just                  IntervalCalification = "J"
+	Major                 IntervalCalification = "M"
+	Augmented             IntervalCalification = "A"
+	UndefinedCalification IntervalCalification = "~"
 )
 
 type IntervalClassification int
 
 const (
-	Third IntervalClassification = 3
-	Fifth IntervalClassification = 5
+	Third                   IntervalClassification = 3
+	Fifth                   IntervalClassification = 5
+	UndefinedClassification IntervalClassification = 0
 )
 
 type Interval struct {
@@ -56,13 +68,25 @@ func GetCalification(classification IntervalClassification, interval Interval) I
 
 func GetNoteFromInterval(note string, classification IntervalClassification, interval Interval) string {
 	if classification == Third {
-		return getThirdFromInterval(note, interval)
+		return getNoteFromInterval(note, Third, interval)
+	}
+
+	if classification == Fifth {
+		return getNoteFromInterval(note, Fifth, interval)
 	}
 
 	return ""
 }
 
-func getThirdFromInterval(sourceNote string, interval Interval) string {
+func getNoteFromInterval(sourceNote string, classification IntervalClassification, interval Interval) string {
+	var intervalCalification IntervalCalification
+
+	if classification == Third {
+		intervalCalification = Major
+	} else {
+		intervalCalification = Just
+	}
+
 	semitonesSum := interval.GetSemitonesSum()
 
 	targetPosition := notesPositions[sourceNote] + semitonesSum
@@ -71,7 +95,7 @@ func getThirdFromInterval(sourceNote string, interval Interval) string {
 
 	rawSourceNote := ExtractNoteRawName(sourceNote)
 
-	targetRawPosition := notesPositions[rawSourceNote] + semitonesSum
+	targetRawPosition := notesPositions[rawSourceNote] + Intervals[classification][intervalCalification].GetSemitonesSum()
 	targetRawNote := positionsNotes[targetRawPosition]
 	targetRawName := ExtractNoteRawName(targetRawNote)
 
@@ -103,4 +127,13 @@ func ExtractNoteRawName(note string) string {
 	}
 
 	return note[0:1]
+}
+
+func SumIntervals(interval1, interval2 Interval) Interval {
+	result := Interval{
+		ChromaticSemitones: interval1.ChromaticSemitones + interval2.ChromaticSemitones,
+		DiatonicSemitones:  interval1.DiatonicSemitones + interval2.DiatonicSemitones,
+	}
+
+	return result
 }
