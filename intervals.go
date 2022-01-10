@@ -89,13 +89,13 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 
 	semitonesSum := interval.GetSemitonesSum()
 
-	targetPosition := notesPositions[sourceNote] + semitonesSum
+	targetPosition := normalizePosition(notesPositions[sourceNote] + semitonesSum)
 	targetNote := positionsNotes[targetPosition]
 	targetName := ExtractNoteRawName(targetNote)
 
 	rawSourceNote := ExtractNoteRawName(sourceNote)
 
-	targetRawPosition := notesPositions[rawSourceNote] + Intervals[classification][intervalCalification].GetSemitonesSum()
+	targetRawPosition := normalizePosition(notesPositions[rawSourceNote] + Intervals[classification][intervalCalification].GetSemitonesSum())
 	targetRawNote := positionsNotes[targetRawPosition]
 	targetRawName := ExtractNoteRawName(targetRawNote)
 
@@ -110,7 +110,7 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 	return positionsNotes[targetPosition]
 }
 
-func normalizeNotePosition(notePosition int) int {
+func normalizePosition(notePosition int) int {
 	if notePosition <= limit {
 		return notePosition
 	}
