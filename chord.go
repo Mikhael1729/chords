@@ -16,7 +16,7 @@ func (chord *Chord) GetCalification() ChordCalification {
 	return MinorChord
 }
 
-func (chord *Chord) SumOperations(operation ChordOperation) {
+func (chord *Chord) SumOperation(operation ChordOperation) {
 	chord.Third = SumIntervals(chord.Third, operation.ThirdOperation)
 	chord.Fifth = SumIntervals(chord.Fifth, operation.FifthOperation)
 }
@@ -30,49 +30,27 @@ func (chord *Chord) IsMajor() bool {
 
 func (chord *Chord) ToString() string {
 	notes := []string{}
-	//fundamentalPosition := *chord.Fundamental
 
 	fundamental := chord.getFundamentalName()
 	notes = append(notes, fundamental)
 
-	third := chord.getThirdNoteName()
+	third := chord.getNote(Third, chord.Third)
 	notes = append(notes, third)
 
-	fifth := chord.getFifthNote()
+	fifth := chord.getNote(Fifth, chord.Fifth)
 	notes = append(notes, fifth)
 
 	return strings.Join(notes, ",")
 }
 
-func (chord *Chord) getFifthNote() string {
-	fundamental := chord.getFundamentalName()
-	fifthCalification := GetCalification(Fifth, chord.Fifth)
-	chordClassification := Intervals[Fifth][fifthCalification]
-	fifth := GetNoteFromInterval(fundamental, Fifth, chordClassification)
-
-	return fifth
-}
-
-func (chord *Chord) getThirdNoteName() string {
-	fundamental := chord.getFundamentalName()
-	thirdCalification := GetCalification(Third, chord.Third)
-	chordClassification := Intervals[Third][thirdCalification]
-	third := GetNoteFromInterval(fundamental, Third, chordClassification)
-
-	return third
+func (chord *Chord) getNote(classification IntervalClassification, interval Interval) string {
+	return GetNoteFromInterval(
+		chord.getFundamentalName(),
+		classification,
+		Intervals[classification][GetCalification(classification, interval)],
+	)
 }
 
 func (chord *Chord) getFundamentalName() string {
 	return positionsNotes[*chord.Fundamental]
-}
-
-func getFifthNoteName(fundamentalPosition, fithNotePosition int) string {
-	if fithNotePosition == 6 {
-		return positionsNotes[fundamentalPosition+14]
-	}
-	if fithNotePosition == 7 {
-		return positionsNotes[fundamentalPosition+12]
-	}
-
-	return positionsNotes[fundamentalPosition+13]
 }

@@ -71,10 +71,10 @@ func (translator *ChordsTranslator) Transition(symbol string) {
 
 		*translator.CurrentState.Fundamental = notePosition
 
-		translator.CurrentState.SumOperations(translator.States[symbol][UndefinedChordCalification])
+		translator.CurrentState.SumOperation(translator.States[symbol][UndefinedChordCalification])
 	}
 
 	chordCalification := translator.CurrentState.GetCalification()
 
-	translator.CurrentState.SumOperations(translator.States[symbol][chordCalification])
+	translator.CurrentState.SumOperation(translator.States[symbol][chordCalification])
 }
