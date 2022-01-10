@@ -31,6 +31,11 @@ func NewChordsTranslator() *ChordsTranslator {
 }
 
 func (translator *ChordsTranslator) Process(word []string) {
+	// Reset the automaton before processing any word
+	if translator.CurrentState.Fundamental != translator.InitialState.Fundamental {
+		translator.CurrentState = translator.InitialState
+	}
+
 	for _, word := range word {
 		translator.Transition(word)
 	}

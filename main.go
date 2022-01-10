@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	chord := []string{"C#", "min"}
+	chord := []string{"B", "min"}
 
 	translator := NewChordsTranslator()
 	translator.Process(chord)

@@ -2,7 +2,7 @@ package main
 
 import "math"
 
-const limit = 11
+const limit = 12
 
 type ChordCalification string
 
@@ -100,7 +100,10 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 	targetRawName := ExtractNoteRawName(targetRawNote)
 
 	if targetName != targetRawName {
-		if targetPosition < targetRawPosition {
+		virtualizedTarget := virtualizeNote(targetPosition, targetRawPosition)
+		virtualizedRawTarget := virtualizeNote(targetRawPosition, targetPosition)
+
+		if virtualizedTarget < virtualizedRawTarget {
 			return missingBemolsPositionsNotes[targetPosition]
 		}
 
@@ -111,7 +114,7 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 }
 
 func normalizePosition(notePosition int) int {
-	if notePosition <= limit {
+	if notePosition < limit {
 		return notePosition
 	}
 
@@ -119,6 +122,18 @@ func normalizePosition(notePosition int) int {
 	normalizedPosition := notePosition - limit*timesLimitIsContained
 
 	return normalizedPosition
+}
+
+func virtualizeNote(targetPosition, targetRawPosition int) int {
+	if math.Abs(float64(targetPosition-targetRawPosition)) < limit-1 {
+		return targetPosition
+	}
+
+	if targetPosition < targetRawPosition {
+		return targetPosition + limit
+	}
+
+	return targetPosition
 }
 
 func ExtractNoteRawName(note string) string {
