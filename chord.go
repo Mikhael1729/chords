@@ -3,7 +3,7 @@ package main
 import "strings"
 
 type Chord struct {
-	Fundamental *int
+	Fundamental int
 	Third       Interval
 	Fifth       Interval
 }
@@ -61,5 +61,5 @@ func (chord *Chord) getNote(classification IntervalClassification, interval Inte
 }
 
 func (chord *Chord) getFundamental() string {
-	return positionsNotes[*chord.Fundamental]
+	return positionsNotes[chord.Fundamental]
 }
