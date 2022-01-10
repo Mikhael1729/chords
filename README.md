@@ -10,5 +10,6 @@ where $C$ is the automaton that computes chord notes and $S$ is the automaton th
 
 ## TODO
 
+- Support double sharps and double bemols
 - Support seventh chords
 - Create the automaton $S$ for recognizing valid words for the language of the automaton $C$
