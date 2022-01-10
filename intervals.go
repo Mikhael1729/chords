@@ -89,7 +89,12 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 
 	semitonesSum := interval.GetSemitonesSum()
 
-	targetPosition := normalizePosition(notesPositions[sourceNote] + semitonesSum)
+	sourcePosition, _, err := GetNotePosition(sourceNote)
+	if err != nil {
+		panic(err)
+	}
+
+	targetPosition := normalizePosition(sourcePosition + semitonesSum)
 	targetNote := positionsNotes[targetPosition]
 	targetName := ExtractNoteRawName(targetNote)
 

@@ -5,10 +5,11 @@ import (
 )
 
 func main() {
-	chord := []string{"B", "min"}
-
 	translator := NewChordsTranslator()
-	translator.Process(chord)
 
-	fmt.Println(translator.CurrentState.ToString())
+	// fmt.Println(translator.Process([]string{"B", "min"}))
+	fmt.Println(translator.Process([]string{"B#"}))
+	// fmt.Println(translator.Process([]string{"B#", "min"}))
+	// fmt.Println(translator.Process([]string{"F"}))
+	// fmt.Println(translator.Process([]string{"E"}))
 }
