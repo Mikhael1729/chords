@@ -95,13 +95,13 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 	}
 
 	targetPosition := normalizePosition(sourcePosition + semitonesSum)
-	targetNote := positionsNotes[targetPosition]
+	targetNote := GetNote(targetPosition)
 	targetName := ExtractNoteRawName(targetNote)
 
 	rawSourceNote := ExtractNoteRawName(sourceNote)
 
 	targetRawPosition := normalizePosition(notesPositions[rawSourceNote] + Intervals[classification][intervalCalification].GetSemitonesSum())
-	targetRawNote := positionsNotes[targetRawPosition]
+	targetRawNote := GetNote(targetRawPosition)
 	targetRawName := ExtractNoteRawName(targetRawNote)
 
 	if targetName != targetRawName {
@@ -109,13 +109,13 @@ func getNoteFromInterval(sourceNote string, classification IntervalClassificatio
 		virtualizedRawTarget := virtualizeNote(targetRawPosition, targetPosition)
 
 		if virtualizedTarget < virtualizedRawTarget {
-			return missingBemolsPositionsNotes[targetPosition]
+			return GetBemolNote(targetPosition)
 		}
 
-		return missingSharpsPositionsNotes[targetPosition]
+		return GetSharpNote(targetPosition)
 	}
 
-	return positionsNotes[targetPosition]
+	return GetNote(targetPosition)
 }
 
 func normalizePosition(notePosition int) int {
