@@ -67,39 +67,32 @@ func GetCalification(classification IntervalClassification, interval Interval) I
 }
 
 func (interval Interval) GetNote(sourceNote string) string {
-	sourcePosition, _, _ := GetNotePosition(sourceNote)
+	sourcePosition, getSourceNote := GetNotePosition2(sourceNote)
 
 	var targetNote string
-	for i := sourcePosition; i < limit; i++ {
+	for i := sourcePosition; i < limit-1; i++ {
 		if interval.GetSemitonesSum() == 0 {
 			return targetNote
 		}
 
-		source := GetNote(i)
-		targetNote = GetNote(normalizePosition(i + 1))
-		semitoneType := GetSemitoneType(source, targetNote)
+		normalizedTargePosition := normalizePosition(i + 1)
 
-		if semitoneType == Chromatic {
-			if interval.ChromaticSemitones > 0 {
-				interval.ChromaticSemitones -= 1
-
+		if (sourcePosition-i+1)%2 == 0 {
+			if interval.DiatonicSemitones > 0 {
+				targetNote = getSourceNote(normalizedTargePosition, Diatonic)
+				interval.DiatonicSemitones -= 1
 				continue
 			}
+		}
 
-			targetNote = GetNoteFromSemitone(source, Diatonic)
-			interval.DiatonicSemitones -= 1
-
+		if interval.ChromaticSemitones > 0 {
+			targetNote = getSourceNote(normalizedTargePosition, Chromatic)
+			interval.ChromaticSemitones -= 1
 			continue
 		}
 
-		if interval.DiatonicSemitones > 0 {
-			interval.DiatonicSemitones -= 1
-
-			continue
-		}
-
-		targetNote = GetNoteFromSemitone(source, Chromatic)
-		interval.ChromaticSemitones -= 1
+		targetNote = getSourceNote(normalizedTargePosition, Diatonic)
+		interval.DiatonicSemitones -= 1
 	}
 
 	return ""
@@ -114,18 +107,6 @@ func normalizePosition(notePosition int) int {
 	normalizedPosition := notePosition - limit*timesLimitIsContained
 
 	return normalizedPosition
-}
-
-func virtualizeNote(targetPosition, targetRawPosition int) int {
-	if math.Abs(float64(targetPosition-targetRawPosition)) < limit-1 {
-		return targetPosition
-	}
-
-	if targetPosition < targetRawPosition {
-		return targetPosition + limit
-	}
-
-	return targetPosition
 }
 
 func ExtractNoteRawName(note string) string {

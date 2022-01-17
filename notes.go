@@ -38,36 +38,14 @@ var (
 		7: "Abb", 9: "Bbb", 10: "Cbb",
 	}
 	doubleSharpsNotesPositions = map[string]int{
-		"Cx": 1, "Dx": 2, "Ex": 4, "Fx": 6,
-		"Gx": 7, "Ax": 9, "Bx": 11,
+		"Bx": 1, "Cx": 2, "Dx": 4, "Ex": 6, "Fx": 7,
+		"Gx": 9, "Ax": 11,
 	}
 	doubleSharpsPositionsNotes = map[int]string{
-		1: "Cx", 2: "Dx", 4: "Ex", 6: "Fx",
-		7: "Gx", 9: "Ax", 11: "Bx",
+		1: "Bx", 2: "Cx", 4: "Dx", 6: "Ex", 7: "Fx",
+		9: "Gx", 11: "Ax",
 	}
 )
-
-func GetNoteFromSemitone(sourceNote string, semitoneType SemitoneType) string {
-	sourcePosition, _, _ := GetNotePosition(sourceNote)
-	targetPosition, _, _ := GetNotePosition(GetNote(normalizePosition(sourcePosition + 1)))
-
-	naturalNote := GetNaturalNote(targetPosition)
-	if GetSemitoneType(sourceNote, naturalNote) == semitoneType {
-		return naturalNote
-	}
-
-	sharpNote := GetSharpNote(targetPosition)
-	if GetSemitoneType(sourceNote, sharpNote) == semitoneType {
-		return sharpNote
-	}
-
-	bemolNote := GetBemolNote(targetPosition)
-	if GetSemitoneType(sourceNote, bemolNote) == semitoneType {
-		return bemolNote
-	}
-
-	return ""
-}
 
 func GetNotePosition(note string) (int, *map[int]string, error) {
 	position, ok := naturalNotesPositions[note]
@@ -96,6 +74,45 @@ func GetNotePosition(note string) (int, *map[int]string, error) {
 	}
 
 	return position, nil, fmt.Errorf(fmt.Sprintf("Invalid note %v", note))
+}
+
+func GetNotePosition2(note string) (int, func(position int, semitoneType SemitoneType) string) {
+	position, ok := bemolsNotesPositions[note]
+	if ok {
+		return position, generateTeNoteFrom(bemolsPositionsNotes, doubleBemolsPositionsNotes, naturalPositionsNotes)
+	}
+
+	position, ok = naturalNotesPositions[note]
+	if ok {
+		return position, generateTeNoteFrom(naturalPositionsNotes, bemolsPositionsNotes, sharpsPositionsNotes)
+	}
+
+	position, ok = sharpsNotesPositions[note]
+	if ok {
+		return position, generateTeNoteFrom(sharpsPositionsNotes, naturalPositionsNotes, doubleSharpsPositionsNotes)
+	}
+
+	return -1, func(position int, semitoneType SemitoneType) string { return "" }
+}
+
+func generateTeNoteFrom(center, left, right map[int]string) func(int, SemitoneType) string {
+	return func(position int, semitoneType SemitoneType) string {
+		if semitoneType == Diatonic {
+			if note, ok := center[position]; ok {
+				return note
+			}
+
+			if note, ok := left[position]; ok {
+				return note
+			}
+		}
+
+		if note, ok := right[position]; ok {
+			return note
+		}
+
+		return center[position]
+	}
 }
 
 func GetNote(position int) string {
