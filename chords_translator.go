@@ -66,7 +66,7 @@ func (translator *ChordsTranslator) Transition(symbol string) error {
 }
 
 func initOperations(translator *ChordsTranslator) {
-	insertNotesTransitions(translator, UndefinedChordCalification, notesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
+	insertNotesTransitions(translator, UndefinedChordCalification, naturalNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
 	insertNotesTransitions(translator, UndefinedChordCalification, bemolsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
 	insertNotesTransitions(translator, UndefinedChordCalification, sharpsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
 	insertNotesTransitions(translator, UndefinedChordCalification, doubleBemolsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})

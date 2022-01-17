@@ -66,56 +66,43 @@ func GetCalification(classification IntervalClassification, interval Interval) I
 	return IntervalCalification("")
 }
 
-func GetNoteFromInterval(note string, classification IntervalClassification, interval Interval) string {
-	if classification == Third {
-		return getNoteFromInterval(note, Third, interval)
-	}
+func (interval Interval) GetNote(sourceNote string) string {
+	sourcePosition, _, _ := GetNotePosition(sourceNote)
 
-	if classification == Fifth {
-		return getNoteFromInterval(note, Fifth, interval)
+	var targetNote string
+	for i := sourcePosition; i < limit; i++ {
+		if interval.GetSemitonesSum() == 0 {
+			return targetNote
+		}
+
+		source := GetNote(i)
+		targetNote = GetNote(normalizePosition(i + 1))
+		semitoneType := GetSemitoneType(source, targetNote)
+
+		if semitoneType == Chromatic {
+			if interval.ChromaticSemitones > 0 {
+				interval.ChromaticSemitones -= 1
+
+				continue
+			}
+
+			targetNote = GetNoteFromSemitone(source, Diatonic)
+			interval.DiatonicSemitones -= 1
+
+			continue
+		}
+
+		if interval.DiatonicSemitones > 0 {
+			interval.DiatonicSemitones -= 1
+
+			continue
+		}
+
+		targetNote = GetNoteFromSemitone(source, Chromatic)
+		interval.ChromaticSemitones -= 1
 	}
 
 	return ""
-}
-
-func getNoteFromInterval(sourceNote string, classification IntervalClassification, interval Interval) string {
-	var intervalCalification IntervalCalification
-
-	if classification == Third {
-		intervalCalification = Major
-	} else {
-		intervalCalification = Just
-	}
-
-	semitonesSum := interval.GetSemitonesSum()
-
-	sourcePosition, _, err := GetNotePosition(sourceNote)
-	if err != nil {
-		panic(err)
-	}
-
-	targetPosition := normalizePosition(sourcePosition + semitonesSum)
-	targetNote := GetNote(targetPosition)
-	targetName := ExtractNoteRawName(targetNote)
-
-	rawSourceNote := ExtractNoteRawName(sourceNote)
-
-	targetRawPosition := normalizePosition(notesPositions[rawSourceNote] + Intervals[classification][intervalCalification].GetSemitonesSum())
-	targetRawNote := GetNote(targetRawPosition)
-	targetRawName := ExtractNoteRawName(targetRawNote)
-
-	if targetName != targetRawName {
-		virtualizedTarget := virtualizeNote(targetPosition, targetRawPosition)
-		virtualizedRawTarget := virtualizeNote(targetRawPosition, targetPosition)
-
-		if virtualizedTarget < virtualizedRawTarget {
-			return GetBemolNote(targetPosition)
-		}
-
-		return GetSharpNote(targetPosition)
-	}
-
-	return GetNote(targetPosition)
 }
 
 func normalizePosition(notePosition int) int {

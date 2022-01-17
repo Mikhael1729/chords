@@ -44,21 +44,13 @@ func (chord *Chord) ToString() string {
 	fundamental := chord.getFundamental()
 	notes = append(notes, fundamental)
 
-	third := chord.getNote(Third, chord.Third)
+	third := chord.Third.GetNote(fundamental)
 	notes = append(notes, third)
 
-	fifth := chord.getNote(Fifth, chord.Fifth)
+	fifth := chord.Fifth.GetNote(fundamental)
 	notes = append(notes, fifth)
 
 	return strings.Join(notes, ", ")
-}
-
-func (chord *Chord) getNote(classification IntervalClassification, interval Interval) string {
-	return GetNoteFromInterval(
-		chord.getFundamental(),
-		classification,
-		Intervals[classification][GetCalification(classification, interval)],
-	)
 }
 
 func (chord *Chord) getFundamental() string {

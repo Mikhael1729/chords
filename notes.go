@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	notesPositions = map[string]int{
+	naturalNotesPositions = map[string]int{
 		"C": 0, "D": 2, "E": 4, "F": 5,
 		"G": 7, "A": 9, "B": 11,
 	}
-	positionsNotes = map[int]string{
+	naturalPositionsNotes = map[int]string{
 		0: "C", 2: "D", 4: "E", 5: "F",
 		7: "G", 9: "A", 11: "B",
 	}
@@ -47,10 +47,32 @@ var (
 	}
 )
 
+func GetNoteFromSemitone(sourceNote string, semitoneType SemitoneType) string {
+	sourcePosition, _, _ := GetNotePosition(sourceNote)
+	targetPosition, _, _ := GetNotePosition(GetNote(normalizePosition(sourcePosition + 1)))
+
+	naturalNote := GetNaturalNote(targetPosition)
+	if GetSemitoneType(sourceNote, naturalNote) == semitoneType {
+		return naturalNote
+	}
+
+	sharpNote := GetSharpNote(targetPosition)
+	if GetSemitoneType(sourceNote, sharpNote) == semitoneType {
+		return sharpNote
+	}
+
+	bemolNote := GetBemolNote(targetPosition)
+	if GetSemitoneType(sourceNote, bemolNote) == semitoneType {
+		return bemolNote
+	}
+
+	return ""
+}
+
 func GetNotePosition(note string) (int, *map[int]string, error) {
-	position, ok := notesPositions[note]
+	position, ok := naturalNotesPositions[note]
 	if ok {
-		return position, &positionsNotes, nil
+		return position, &naturalPositionsNotes, nil
 	}
 
 	position, ok = bemolsNotesPositions[note]
@@ -96,7 +118,7 @@ func GetNote(position int) string {
 }
 
 func GetNaturalNote(position int) string {
-	note, ok := positionsNotes[position]
+	note, ok := naturalPositionsNotes[position]
 	if ok {
 		return note
 	}
