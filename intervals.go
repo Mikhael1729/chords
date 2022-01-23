@@ -80,19 +80,15 @@ func (interval Interval) GetNote(sourceNote string) string {
 		if (sourcePosition-i+1)%2 == 0 {
 			if interval.DiatonicSemitones > 0 {
 				targetNote = getSourceNote(normalizedTargePosition, Diatonic)
+				_, getSourceNote = GetNotePosition2(sourceNote)
 				interval.DiatonicSemitones -= 1
 				continue
 			}
 		}
 
-		if interval.ChromaticSemitones > 0 {
-			targetNote = getSourceNote(normalizedTargePosition, Chromatic)
-			interval.ChromaticSemitones -= 1
-			continue
-		}
-
-		targetNote = getSourceNote(normalizedTargePosition, Diatonic)
-		interval.DiatonicSemitones -= 1
+		targetNote = getSourceNote(normalizedTargePosition, Chromatic)
+		_, getSourceNote = GetNotePosition2(sourceNote)
+		interval.ChromaticSemitones -= 1
 	}
 
 	return ""

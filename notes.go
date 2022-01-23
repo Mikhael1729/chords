@@ -92,6 +92,16 @@ func GetNotePosition2(note string) (int, func(position int, semitoneType Semiton
 		return position, generateTeNoteFrom(sharpsPositionsNotes, naturalPositionsNotes, doubleSharpsPositionsNotes)
 	}
 
+	position, ok = doubleBemolsNotesPositions[note]
+	if ok {
+		return position, generateTeNoteFrom(doubleBemolsPositionsNotes, map[int]string{}, bemolsPositionsNotes)
+	}
+
+	position, ok = doubleSharpsNotesPositions[note]
+	if ok {
+		return position, generateTeNoteFrom(doubleSharpsPositionsNotes, sharpsPositionsNotes, map[int]string{})
+	}
+
 	return -1, func(position int, semitoneType SemitoneType) string { return "" }
 }
 
@@ -107,11 +117,7 @@ func generateTeNoteFrom(center, left, right map[int]string) func(int, SemitoneTy
 			}
 		}
 
-		if note, ok := right[position]; ok {
-			return note
-		}
-
-		return center[position]
+		return right[position]
 	}
 }
 
