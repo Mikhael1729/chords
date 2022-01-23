@@ -1,15 +1,5 @@
 package main
 
-type ChordCalification string
-
-const (
-	MinorChord                 ChordCalification = "minor"
-	MajorChord                 ChordCalification = "major"
-	DiminishedChord            ChordCalification = "diminished"
-	AugmentedChord             ChordCalification = "augmented"
-	UndefinedChordCalification ChordCalification = "undefined"
-)
-
 type IntervalCalification string
 
 const (
@@ -61,20 +51,10 @@ func (interval Interval) GetClassification() IntervalClassification {
 	return Fifth
 }
 
-func GetCalification(classification IntervalClassification, interval Interval) IntervalCalification {
-	for calification, currentInterval := range Intervals[classification] {
-		if currentInterval == interval {
-			return calification
-		}
-	}
-
-	return IntervalCalification("")
-}
-
 func (interval Interval) GetNote(sourceNote string) string {
 	sourcePosition := GetNotePosition(sourceNote)
 	semitones := interval.GetSemitonesSum()
-	targetPosition := NormalizeNotePosition(sourcePosition + semitones)
+	targetPosition := normalizeNotePosition(sourcePosition + semitones)
 
 	diatonicSourcePosition := GetNotePosition(string(sourceNote[0]))
 	diatonicTargetName := countNotes(diatonicSourcePosition, int(interval.GetClassification()))
@@ -96,7 +76,7 @@ func countNotes(sourcePosition, times int) string {
 
 	var note string
 	for i := sourcePosition; times > 0; i++ {
-		position := NormalizeNotePosition(base + i)
+		position := normalizeNotePosition(base + i)
 
 		note = positionsNotes[position]
 		if note == "" {
@@ -110,9 +90,9 @@ func countNotes(sourcePosition, times int) string {
 }
 
 func getName(position int, diatonicTargetName string, center, left, right NoteBase) string {
-	nameInLeft := GetNoteName(NormalizeNotePosition(position + int(left)))
-	nameInCenter := GetNoteName(NormalizeNotePosition(position + int(center)))
-	nameInRight := GetNoteName(NormalizeNotePosition(position + int(right)))
+	nameInLeft := GetNoteName(normalizeNotePosition(position + int(left)))
+	nameInCenter := GetNoteName(normalizeNotePosition(position + int(center)))
+	nameInRight := GetNoteName(normalizeNotePosition(position + int(right)))
 
 	if len(nameInRight) > 0 && string(nameInRight[0]) == diatonicTargetName {
 		return nameInRight

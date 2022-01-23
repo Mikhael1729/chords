@@ -6,10 +6,7 @@ import (
 
 func main() {
 	translator := NewChordsTranslator()
+	bSharpnotes := translator.Process("B#", "min")
 
-	// fmt.Println(translator.Process([]string{"B", "min"}))
-	fmt.Println(translator.Process([]string{"B#"}))
-	// fmt.Println(translator.Process([]string{"B#", "min"}))
-	// fmt.Println(translator.Process([]string{"F"}))
-	// fmt.Println(translator.Process([]string{"E"}))
+	fmt.Println(bSharpnotes)
 }

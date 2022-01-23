@@ -7,11 +7,6 @@ var (
 	dimSymbols = map[string]bool{"dim": true, "°": true}
 )
 
-type ChordOperation struct {
-	ThirdOperation Interval
-	FifthOperation Interval
-}
-
 type ChordsTranslator struct {
 	Operations   map[string]map[ChordCalification]ChordOperation
 	InitialState Chord
@@ -30,7 +25,7 @@ func NewChordsTranslator() *ChordsTranslator {
 	return newTranslator
 }
 
-func (translator *ChordsTranslator) Process(word []string) string {
+func (translator *ChordsTranslator) Process(word ...string) string {
 	needToResetCurrentState := !translator.currentStateIsInitial()
 	if needToResetCurrentState {
 		translator.CurrentState = translator.InitialState

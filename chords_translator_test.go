@@ -21,7 +21,7 @@ func TestChordsTranslator_Process(t *testing.T) {
 	translator := NewChordsTranslator()
 
 	for _, testCase := range testCases {
-		notes := translator.Process(testCase.word)
+		notes := translator.Process(testCase.word...)
 		assert.Equal(testCase.expectedChordNotes, notes)
 	}
 }

@@ -43,7 +43,7 @@ func GetNoteName(position int) string {
 	return positionsNotes[position]
 }
 
-func NormalizeNotePosition(position int) int {
+func normalizeNotePosition(position int) int {
 	base := int(getBase(position))
 	isNegative := position < 0
 	position = int(math.Abs(float64(position)))

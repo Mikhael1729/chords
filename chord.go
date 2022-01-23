@@ -2,6 +2,21 @@ package main
 
 import "strings"
 
+type ChordCalification string
+
+const (
+	MinorChord                 ChordCalification = "minor"
+	MajorChord                 ChordCalification = "major"
+	DiminishedChord            ChordCalification = "diminished"
+	AugmentedChord             ChordCalification = "augmented"
+	UndefinedChordCalification ChordCalification = "undefined"
+)
+
+type ChordOperation struct {
+	ThirdOperation Interval
+	FifthOperation Interval
+}
+
 type Chord struct {
 	Fundamental int
 	Third       Interval
