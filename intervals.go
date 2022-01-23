@@ -1,9 +1,5 @@
 package main
 
-import "math"
-
-const limit = 12
-
 type ChordCalification string
 
 const (
@@ -67,50 +63,27 @@ func GetCalification(classification IntervalClassification, interval Interval) I
 }
 
 func (interval Interval) GetNote(sourceNote string) string {
-	sourcePosition, getSourceNote := GetNotePosition2(sourceNote)
+	limit := int(getBase(GetNotePosition(sourceNote))) + NotesQuantity - 1
 
 	var targetNote string
-	for i := sourcePosition; i < limit-1; i++ {
+	for i := GetNotePosition(sourceNote); i < limit; i++ {
+		targetPosition := NormalizeNotePosition(i + 1)
+		targetNote = GetNoteName(targetPosition)
+
 		if interval.GetSemitonesSum() == 0 {
 			return targetNote
 		}
 
-		normalizedTargePosition := normalizePosition(i + 1)
-
-		if (sourcePosition-i+1)%2 == 0 {
-			if interval.DiatonicSemitones > 0 {
-				targetNote = getSourceNote(normalizedTargePosition, Diatonic)
-				_, getSourceNote = GetNotePosition2(sourceNote)
-				interval.DiatonicSemitones -= 1
-				continue
-			}
+		semitoneType := GetSemitoneType(i, targetPosition)
+		if semitoneType == Chromatic {
+			interval.ChromaticSemitones -= 1
+			continue
 		}
 
-		targetNote = getSourceNote(normalizedTargePosition, Chromatic)
-		_, getSourceNote = GetNotePosition2(sourceNote)
-		interval.ChromaticSemitones -= 1
+		interval.DiatonicSemitones -= 1
 	}
 
-	return ""
-}
-
-func normalizePosition(notePosition int) int {
-	if notePosition < limit {
-		return notePosition
-	}
-
-	timesLimitIsContained := int(math.Floor(float64(notePosition) / float64(limit)))
-	normalizedPosition := notePosition - limit*timesLimitIsContained
-
-	return normalizedPosition
-}
-
-func ExtractNoteRawName(note string) string {
-	if len(note) == 1 {
-		return note
-	}
-
-	return note[0:1]
+	return targetNote
 }
 
 func SumIntervals(interval1, interval2 Interval) Interval {

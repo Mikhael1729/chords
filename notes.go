@@ -1,178 +1,91 @@
 package main
 
-import (
-	"fmt"
+import "math"
+
+type NoteBase int
+
+const (
+	NaturalNotesBase     = 0
+	SharpNotesBase       = 24
+	DoubleSharpNotesBase = 48
+	BemolNotesBase       = -24
+	DoubleBemolNotesBase = -48
+)
+
+const (
+	NotesQuantity = 12
+	Separation    = 24
 )
 
 var (
-	naturalNotesPositions = map[string]int{
-		"C": 0, "D": 2, "E": 4, "F": 5,
-		"G": 7, "A": 9, "B": 11,
+	notesPositions = map[string]int{
+		"Dbb": -48, "Ebb": -50, "Fbb": -51, "Gbb": -53, "Abb": -55, "Bbb": -57, "Cbb": -58,
+		"Db": -25, "Eb": -27, "Fb": -28, "Gb": -30, "Ab": -32, "Bb": -34, "Cb": -35,
+		"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11,
+		"B#": 24, "C#": 25, "D#": 27, "E#": 29, "F#": 30, "G#": 32, "A#": 34,
+		"Bx": 49, "Cx": 50, "Dx": 52, "Ex": 54, "Fx": 55, "Gx": 57, "Ax": 59,
 	}
-	naturalPositionsNotes = map[int]string{
-		0: "C", 2: "D", 4: "E", 5: "F",
-		7: "G", 9: "A", 11: "B",
-	}
-	bemolsNotesPositions = map[string]int{
-		"Db": 1, "Eb": 3, "Fb": 4, "Gb": 6,
-		"Ab": 8, "Bb": 10, "Cb": 11,
-	}
-	bemolsPositionsNotes = map[int]string{
-		1: "Db", 3: "Eb", 4: "Fb", 6: "Gb",
-		8: "Ab", 10: "Bb", 11: "Cb",
-	}
-	sharpsNotesPositions = map[string]int{
-		"B#": 0, "C#": 1, "D#": 3, "E#": 5,
-		"F#": 6, "G#": 8, "A#": 10,
-	}
-	sharpsPositionsNotes = map[int]string{
-		0: "B#", 1: "C#", 3: "D#", 5: "E#",
-		6: "F#", 8: "G#", 10: "A#",
-	}
-	doubleBemolsNotesPositions = map[string]int{
-		"Dbb": 0, "Ebb": 2, "Fbb": 3, "Gbb": 5,
-		"Abb": 7, "Bbb": 9, "Cbb": 10,
-	}
-	doubleBemolsPositionsNotes = map[int]string{
-		0: "Dbb", 2: "Ebb", 3: "Fbb", 5: "Gbb",
-		7: "Abb", 9: "Bbb", 10: "Cbb",
-	}
-	doubleSharpsNotesPositions = map[string]int{
-		"Bx": 1, "Cx": 2, "Dx": 4, "Ex": 6, "Fx": 7,
-		"Gx": 9, "Ax": 11,
-	}
-	doubleSharpsPositionsNotes = map[int]string{
-		1: "Bx", 2: "Cx", 4: "Dx", 6: "Ex", 7: "Fx",
-		9: "Gx", 11: "Ax",
+
+	positionsNotes = map[int]string{
+		-48: "Dbb", -50: "Ebb", -51: "Fbb", -53: "Gbb", -55: "Abb", -57: "Bbb", -58: "Cbb",
+		-25: "Db", -27: "Eb", -28: "Fb", -30: "Gb", -32: "Ab", -34: "Bb", -35: "Cb",
+		0: "C", 2: "D", 4: "E", 5: "F", 7: "G", 9: "A", 11: "B",
+		24: "B#", 25: "C#", 27: "D#", 29: "E#", 30: "F#", 32: "G#", 34: "A#",
+		49: "Bx", 50: "Cx", 52: "Dx", 54: "Ex", 55: "Fx", 57: "Gx", 59: "Ax",
 	}
 )
 
-func GetNotePosition(note string) (int, *map[int]string, error) {
-	position, ok := naturalNotesPositions[note]
-	if ok {
-		return position, &naturalPositionsNotes, nil
-	}
-
-	position, ok = bemolsNotesPositions[note]
-	if ok {
-		return position, &bemolsPositionsNotes, nil
-	}
-
-	position, ok = sharpsNotesPositions[note]
-	if ok {
-		return position, &sharpsPositionsNotes, nil
-	}
-
-	position, ok = doubleBemolsNotesPositions[note]
-	if ok {
-		return position, &doubleBemolsPositionsNotes, nil
-	}
-
-	position, ok = doubleSharpsNotesPositions[note]
-	if ok {
-		return position, &doubleSharpsPositionsNotes, nil
-	}
-
-	return position, nil, fmt.Errorf(fmt.Sprintf("Invalid note %v", note))
+func GetNotePosition(note string) int {
+	return notesPositions[note]
 }
 
-func GetNotePosition2(note string) (int, func(position int, semitoneType SemitoneType) string) {
-	position, ok := bemolsNotesPositions[note]
-	if ok {
-		return position, generateTeNoteFrom(bemolsPositionsNotes, doubleBemolsPositionsNotes, naturalPositionsNotes)
-	}
-
-	position, ok = naturalNotesPositions[note]
-	if ok {
-		return position, generateTeNoteFrom(naturalPositionsNotes, bemolsPositionsNotes, sharpsPositionsNotes)
-	}
-
-	position, ok = sharpsNotesPositions[note]
-	if ok {
-		return position, generateTeNoteFrom(sharpsPositionsNotes, naturalPositionsNotes, doubleSharpsPositionsNotes)
-	}
-
-	position, ok = doubleBemolsNotesPositions[note]
-	if ok {
-		return position, generateTeNoteFrom(doubleBemolsPositionsNotes, map[int]string{}, bemolsPositionsNotes)
-	}
-
-	position, ok = doubleSharpsNotesPositions[note]
-	if ok {
-		return position, generateTeNoteFrom(doubleSharpsPositionsNotes, sharpsPositionsNotes, map[int]string{})
-	}
-
-	return -1, func(position int, semitoneType SemitoneType) string { return "" }
+func GetNoteName(position int) string {
+	return positionsNotes[position]
 }
 
-func generateTeNoteFrom(center, left, right map[int]string) func(int, SemitoneType) string {
-	return func(position int, semitoneType SemitoneType) string {
-		if semitoneType == Diatonic {
-			if note, ok := center[position]; ok {
-				return note
-			}
+func NormalizeNotePosition(position int) int {
+	base := int(getBase(position))
+	isNegative := position < 0
+	position = int(math.Abs(float64(position)))
+	base = int(math.Abs(float64(base)))
 
-			if note, ok := left[position]; ok {
-				return note
-			}
-		}
+	normalizedQuantity := base + NotesQuantity
 
-		return right[position]
+	if position >= base && position < normalizedQuantity {
+		return multiplyIf(isNegative, position, -1)
 	}
+
+	times := int(math.Floor(float64(position) / float64(normalizedQuantity)))
+	normalizedPosition := position + base
+	normalized := normalizedPosition - normalizedQuantity*times
+
+	return multiplyIf(isNegative, normalized, -1)
 }
 
-func GetNote(position int) string {
-	note := GetNaturalNote(position)
-	if note != "" {
-		return note
+func getBase(position int) NoteBase {
+	if position >= DoubleSharpNotesBase {
+		return DoubleSharpNotesBase
 	}
 
-	note = GetBemolNote(position)
-	if note != "" {
-		return note
+	if position >= SharpNotesBase {
+		return SharpNotesBase
 	}
 
-	note = GetSharpNote(position)
-	if note != "" {
-		return note
+	if position >= NaturalNotesBase {
+		return NaturalNotesBase
 	}
 
-	return ""
+	if position >= BemolNotesBase {
+		return BemolNotesBase
+	}
+
+	return DoubleBemolNotesBase
 }
 
-func GetNaturalNote(position int) string {
-	note, ok := naturalPositionsNotes[position]
-	if ok {
-		return note
+func multiplyIf(condition bool, multiplicand, multiplier int) int {
+	if !condition {
+		return multiplicand
 	}
 
-	return ""
-}
-
-func GetBemolNote(position int) string {
-	note, ok := bemolsPositionsNotes[position]
-	if ok {
-		return note
-	}
-
-	note, ok = doubleBemolsPositionsNotes[position]
-	if ok {
-		return note
-	}
-
-	return ""
-}
-
-func GetSharpNote(position int) string {
-	note, ok := sharpsPositionsNotes[position]
-	if ok {
-		return note
-	}
-
-	note, ok = doubleSharpsPositionsNotes[position]
-	if ok {
-		return note
-	}
-
-	return ""
+	return multiplicand * multiplier
 }

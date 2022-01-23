@@ -3,10 +3,9 @@ package main
 import "strings"
 
 type Chord struct {
-	Fundamental       int
-	Third             Interval
-	Fifth             Interval
-	fundamentalSource *map[int]string
+	Fundamental int
+	Third       Interval
+	Fifth       Interval
 }
 
 func (chord *Chord) GetCalification() ChordCalification {
@@ -40,8 +39,8 @@ func (chord *Chord) SumOperation(operation ChordOperation) {
 
 func (chord *Chord) ToString() string {
 	notes := []string{}
+	fundamental := GetNoteName(chord.Fundamental)
 
-	fundamental := chord.getFundamental()
 	notes = append(notes, fundamental)
 
 	third := chord.Third.GetNote(fundamental)
@@ -51,8 +50,4 @@ func (chord *Chord) ToString() string {
 	notes = append(notes, fifth)
 
 	return strings.Join(notes, ", ")
-}
-
-func (chord *Chord) getFundamental() string {
-	return (*chord.fundamentalSource)[chord.Fundamental]
 }

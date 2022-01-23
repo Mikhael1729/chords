@@ -15,7 +15,7 @@ func TestChordsTranslator_Process(t *testing.T) {
 	}{
 		// {[]string{"B", "min"}, "B, D, F#"},
 		// {[]string{"B#"}, "B#, D#, F#"},
-		{[]string{"B#", "min"}, ""},
+		{[]string{"B#", "min"}, "B# D F#"},
 	}
 
 	translator := NewChordsTranslator()

@@ -31,8 +31,8 @@ func NewChordsTranslator() *ChordsTranslator {
 }
 
 func (translator *ChordsTranslator) Process(word []string) string {
-	// Reset the automaton before processing any word
-	if translator.CurrentState.Fundamental != translator.InitialState.Fundamental {
+	needToResetCurrentState := !translator.currentStateIsInitial()
+	if needToResetCurrentState {
 		translator.CurrentState = translator.InitialState
 	}
 
@@ -47,30 +47,27 @@ func (translator *ChordsTranslator) Process(word []string) string {
 }
 
 func (translator *ChordsTranslator) Transition(symbol string) error {
-	if translator.CurrentState.Fundamental == translator.InitialState.Fundamental {
-		notePosition, source, err := GetNotePosition(symbol)
-		if err != nil {
-			return err
-		}
+	if translator.currentStateIsInitial() {
+		notePosition := GetNotePosition(symbol)
 
 		translator.CurrentState.Fundamental = notePosition
-		translator.CurrentState.fundamentalSource = source
 		translator.CurrentState.SumOperation(translator.Operations[symbol][UndefinedChordCalification])
 	}
 
 	chordCalification := translator.CurrentState.GetCalification()
+	operation := translator.Operations[symbol][chordCalification]
 
-	translator.CurrentState.SumOperation(translator.Operations[symbol][chordCalification])
+	translator.CurrentState.SumOperation(operation)
 
 	return nil
 }
 
+func (translator ChordsTranslator) currentStateIsInitial() bool {
+	return translator.CurrentState.Fundamental == translator.InitialState.Fundamental
+}
+
 func initOperations(translator *ChordsTranslator) {
-	insertNotesTransitions(translator, UndefinedChordCalification, naturalNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
-	insertNotesTransitions(translator, UndefinedChordCalification, bemolsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
-	insertNotesTransitions(translator, UndefinedChordCalification, sharpsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
-	insertNotesTransitions(translator, UndefinedChordCalification, doubleBemolsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
-	insertNotesTransitions(translator, UndefinedChordCalification, doubleSharpsNotesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
+	insertNotesTransitions(translator, UndefinedChordCalification, notesPositions, ChordOperation{Intervals[Third][Major], Intervals[Fifth][Just]})
 
 	insertTransition(translator, MajorChord, majSymbols, ChordOperation{Interval{0, 0}, Interval{0, 0}})
 	insertTransition(translator, MajorChord, minSymbols, ChordOperation{Interval{-1, 0}, Interval{0, 0}})

@@ -1,7 +1,5 @@
 package main
 
-import "math"
-
 type SemitoneType string
 
 const (
@@ -10,20 +8,13 @@ const (
 	UndefinedSemitoneType SemitoneType = "undefined_semitone"
 )
 
-func GetSemitoneType(source, target string) SemitoneType {
-	sourcePosition, _, _ := GetNotePosition(source)
-	targetPosition, _, _ := GetNotePosition(target)
+func GetSemitoneType(sourcePosition, targetPosition int) SemitoneType {
+	sourceName := GetNoteName(sourcePosition)
+	targetName := GetNoteName(targetPosition)
 
-	if math.Abs(float64(sourcePosition-targetPosition)) != 1 {
-		return UndefinedSemitoneType
+	if sourceName[0] != targetName[0] {
+		return Diatonic
 	}
 
-	rawSource := ExtractNoteRawName(source)
-	rawTarget := ExtractNoteRawName(target)
-
-	if rawSource == rawTarget {
-		return Chromatic
-	}
-
-	return Diatonic
+	return Chromatic
 }
