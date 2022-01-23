@@ -6,7 +6,7 @@ import (
 
 func main() {
 	translator := NewChordsTranslator()
-	bSharpnotes := translator.Process("B#", "min")
+	bSharpMinor := translator.Process("B#", "min")
 
-	fmt.Println(bSharpnotes)
+	fmt.Println(bSharpMinor)
 }
