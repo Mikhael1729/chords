@@ -52,6 +52,15 @@ var Intervals = map[IntervalClassification]map[IntervalCalification]Interval{
 	},
 }
 
+func (interval Interval) GetClassification() IntervalClassification {
+	sum := interval.GetSemitonesSum()
+	if sum >= Intervals[Third][Diminished].GetSemitonesSum() && sum <= Intervals[Third][Augmented].GetSemitonesSum() {
+		return Third
+	}
+
+	return Fifth
+}
+
 func GetCalification(classification IntervalClassification, interval Interval) IntervalCalification {
 	for calification, currentInterval := range Intervals[classification] {
 		if currentInterval == interval {
@@ -63,27 +72,57 @@ func GetCalification(classification IntervalClassification, interval Interval) I
 }
 
 func (interval Interval) GetNote(sourceNote string) string {
-	limit := int(getBase(GetNotePosition(sourceNote))) + NotesQuantity - 1
+	sourcePosition := GetNotePosition(sourceNote)
+	semitones := interval.GetSemitonesSum()
+	targetPosition := NormalizeNotePosition(sourcePosition + semitones)
 
-	var targetNote string
-	for i := GetNotePosition(sourceNote); i < limit; i++ {
-		targetPosition := NormalizeNotePosition(i + 1)
-		targetNote = GetNoteName(targetPosition)
+	diatonicSourcePosition := GetNotePosition(string(sourceNote[0]))
+	diatonicTargetName := countNotes(diatonicSourcePosition, int(interval.GetClassification()))
 
-		if interval.GetSemitonesSum() == 0 {
-			return targetNote
-		}
+	switch getBase(sourcePosition) {
+	case NaturalNotesBase:
+		return getName(targetPosition, diatonicTargetName, NaturalNotesBase, BemolNotesBase, SharpNotesBase)
+	case SharpNotesBase:
+		return getName(targetPosition, diatonicTargetName, SharpNotesBase, NaturalNotesBase, DoubleSharpNotesBase)
+	case BemolNotesBase:
+		return getName(targetPosition, diatonicTargetName, BemolNotesBase, DoubleBemolNotesBase, NaturalNotesBase)
+	}
 
-		semitoneType := GetSemitoneType(i, targetPosition)
-		if semitoneType == Chromatic {
-			interval.ChromaticSemitones -= 1
+	return ""
+}
+
+func countNotes(sourcePosition, times int) string {
+	base := int(getBase(sourcePosition))
+
+	var note string
+	for i := sourcePosition; times > 0; i++ {
+		position := NormalizeNotePosition(base + i)
+
+		note = positionsNotes[position]
+		if note == "" {
 			continue
 		}
 
-		interval.DiatonicSemitones -= 1
+		times--
 	}
 
-	return targetNote
+	return note
+}
+
+func getName(position int, diatonicTargetName string, center, left, right NoteBase) string {
+	nameInLeft := GetNoteName(NormalizeNotePosition(position + int(left)))
+	nameInCenter := GetNoteName(NormalizeNotePosition(position + int(center)))
+	nameInRight := GetNoteName(NormalizeNotePosition(position + int(right)))
+
+	if len(nameInRight) > 0 && string(nameInRight[0]) == diatonicTargetName {
+		return nameInRight
+	}
+
+	if len(nameInCenter) > 0 && string(nameInCenter[0]) == diatonicTargetName {
+		return nameInCenter
+	}
+
+	return nameInLeft
 }
 
 func SumIntervals(interval1, interval2 Interval) Interval {
